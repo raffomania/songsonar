@@ -17,6 +17,7 @@ defmodule ExyarrWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/spotify-connected", PageController, :oauth_redirect
   end
 
   # Other scopes may use custom stacks.
