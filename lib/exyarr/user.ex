@@ -20,6 +20,6 @@ defmodule Exyarr.User do
       :refresh_token,
       :weeks_in_playlist
     ])
-    |> validate_required([:spotify_id, :playlist_id])
+    |> validate_required([:spotify_id, :access_token, :refresh_token])
   end
 end
