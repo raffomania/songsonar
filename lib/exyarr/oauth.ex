@@ -21,5 +21,6 @@ defmodule Exyarr.Oauth do
     &redirect_uri=#{redirect_uri}
     &scope=#{scopes}
     """
+      |> String.replace("\n", "")
   end
 end

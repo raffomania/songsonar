@@ -3,6 +3,9 @@ defmodule ExyarrWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
+    escaped_uri = Exyarr.Oauth.autorize_uri()
+      |> Phoenix.HTML.html_escape()
+      |> Phoenix.HTML.safe_to_string()
+    assert html_response(conn, 200) =~ escaped_uri
   end
 end
