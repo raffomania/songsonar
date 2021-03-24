@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 db_user =
   System.get_env("DATABASE_USER") || raise "env var DATABASE_USER not set"
