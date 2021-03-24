@@ -13,7 +13,13 @@ defmodule Exyarr.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:spotify_id, :playlist_id, :access_token, :refresh_token, :weeks_in_playlist])
+    |> cast(attrs, [
+      :spotify_id,
+      :playlist_id,
+      :access_token,
+      :refresh_token,
+      :weeks_in_playlist
+    ])
     |> validate_required([:spotify_id, :playlist_id])
   end
 end

@@ -13,8 +13,13 @@ config :exyarr,
 # Configures the endpoint
 config :exyarr, ExyarrWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "SKvMKjOp1o6siQ+JXHEZ6fWGXJKZIEq7MrkZGr5eo4orLBUktDdrlzUPRQpfWZzX",
-  render_errors: [view: ExyarrWeb.ErrorView, accepts: ~w(html json), layout: false],
+  secret_key_base:
+    "SKvMKjOp1o6siQ+JXHEZ6fWGXJKZIEq7MrkZGr5eo4orLBUktDdrlzUPRQpfWZzX",
+  render_errors: [
+    view: ExyarrWeb.ErrorView,
+    accepts: ~w(html json),
+    layout: false
+  ],
   pubsub_server: Exyarr.PubSub,
   live_view: [signing_salt: "0kOBvuJr"]
 
