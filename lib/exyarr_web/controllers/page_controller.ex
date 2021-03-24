@@ -10,7 +10,9 @@ defmodule ExyarrWeb.PageController do
       Exyarr.Oauth.request_tokens(code)
 
     user_id =
-      Exyarr.Spotify.get!("/me", Authorization: "Bearer #{access_token}").body["id"]
+      Exyarr.Spotify.get!("/me", Authorization: "Bearer #{access_token}").body[
+        "id"
+      ]
 
     user = %Exyarr.User{
       access_token: access_token,
