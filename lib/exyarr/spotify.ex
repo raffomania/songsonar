@@ -7,6 +7,12 @@ defmodule Exyarr.Spotify do
     @endpoint <> url
   end
 
+  def process_request_headers(headers) do
+    case Keyword.fetch(headers, :access_token) do
+      {:ok, token} -> Keyword.put(headers, :Authorization, "Bearer #{token}")
+    end
+  end
+
   def process_response_body(body) do
     body
     |> Poison.decode!()

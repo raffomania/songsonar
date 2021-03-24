@@ -10,7 +10,7 @@ defmodule ExyarrWeb.PageController do
       Exyarr.Oauth.request_tokens(code)
 
     user_id =
-      Exyarr.Spotify.get!("/me", Authorization: "Bearer #{access_token}").body[
+      Exyarr.Spotify.get!("/me", access_token: access_token).body[
         "id"
       ]
 
@@ -20,7 +20,7 @@ defmodule ExyarrWeb.PageController do
       spotify_id: user_id
     }
 
-    Exyarr.Repo.insert!(user)
+    Exyarr.Repo.insert!(user, on_conflict: :replace_all, conflict_target: :spotify_id)
 
     conn
     |> put_flash(:info, "Connected!")
