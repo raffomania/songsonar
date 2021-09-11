@@ -24,4 +24,5 @@ pretty_env_logger = "0.4"
 thiserror = "1"
 anyhow = "1"
 aspotify = "0.7.0"
-askama = { version = "0.10.5", features = [ "with-rocket" ] }
+askama = { git = "https://github.com/djc/askama.git", branch = "main", features = ["with-rocket", "mime", "mime_guess"] }
+askama_rocket = { git = "https://github.com/djc/askama.git", branch = "main" }
