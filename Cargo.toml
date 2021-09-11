@@ -2,12 +2,20 @@
 name = "songsonar"
 version = "0.1.0"
 edition = "2018"
+publish = false
+license = "GPL-3.0-or-later"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+lto = "thin"
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch,
+# and we don't rely on it for debugging that much.
+debug = false
 
 [dependencies]
 rocket = { version = "0.5.0-rc.1", features = [ "tls" ] }
-sqlx = { version = "0.5", features = [ "runtime-tokio-rustls", "postgres", "macros", "chrono", "uuid", "migrate" ] }
+sqlx = { version = "0.5", features = [ "runtime-tokio-native-tls", "postgres", "macros", "chrono", "uuid", "migrate" ] }
 tokio = { version = "1", features = ["rt", "process"] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
 chrono = { version = "0.4", features = [ "serde" ] }
@@ -16,3 +24,4 @@ pretty_env_logger = "0.4"
 thiserror = "1"
 anyhow = "1"
 aspotify = "0.7.0"
+askama = { version = "0.10.5", features = [ "with-rocket" ] }
