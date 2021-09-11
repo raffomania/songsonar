@@ -1,8 +1,16 @@
 set dotenv-load := true
 
+# Run the application
 run *args:
     cargo run {{args}}
 
+# Watch for something
+# E.g. `just watch run --release` or `just watch test`
+watch *args:
+    cargo watch --shell 'just {{ args }}'
+
+# Create a self-signed certificate for testing
+# See .env.example for configuring the app to use it
 local-cert:
     mkdir -p target
     mkcert -cert-file target/localhost.crt -key-file target/localhost.key example.com "*.example.com" localhost 127.0.0.1 ::1 $(hostname)
