@@ -16,7 +16,7 @@ jobs:
             target: x86_64-unknown-linux-musl
             artifact_name: target/x86_64-unknown-linux-musl/release/songsonar
             release_name: x86_64-unknown-linux-musl
-            cross: true
+            cross: false
             strip: true
             compress: true
             cargo_flags: ""
