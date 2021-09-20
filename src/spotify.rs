@@ -16,7 +16,12 @@ pub fn get_client() -> Client {
 /// and persist it.
 pub fn get_authorization_url(cookies: &CookieJar<'_>) -> String {
     let client_id = &get_client().credentials.id;
-    let scopes = vec![Scope::UserFollowRead];
+    let scopes = vec![
+        Scope::UserFollowRead,
+        Scope::PlaylistModifyPrivate,
+        Scope::PlaylistReadPrivate,
+        Scope::PlaylistModifyPublic,
+    ];
     let force_approve = false;
     let root_url =
         std::env::var("ROOT_URL").expect("Please set the ROOT_URL env var");
