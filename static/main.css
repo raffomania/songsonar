@@ -1,0 +1,89 @@
+body {
+  background: #213144;
+  color: white;
+  font-size: clamp(16px, 2vw + 8px, 20px);
+  font-family: Helvetica, Arial, sans-serif;
+  background: radial-gradient(
+      ellipse 200vw 80rem at 50% -10rem,
+      #1fefca 0%,
+      #314a66 80%,
+      #263341 100%
+    )
+    no-repeat;
+  margin: 0;
+  min-height: 100vh;
+  padding: 5vw 1rem 1rem;
+}
+
+h1,
+h2,
+a {
+  text-shadow: 0px 1px 1px #556b7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #00fc88;
+}
+
+.logo {
+  max-width: 100%;
+  max-height: clamp(8rem, 20vw, 12rem);
+  animation: hover 3.5s infinite alternate ease-in-out;
+  margin: 2rem 4vw;
+}
+
+.content {
+  width: 40rem;
+}
+
+.btn {
+  border-radius: 3px;
+  border: 1px solid #00fc88;
+  padding: 1em;
+}
+
+@keyframes hover {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(1rem);
+  }
+}
+
+/* 
+ * utilities 
+ */
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.mt-16 {
+  margin-top: 4rem;
+}
+
+.text-center {
+  text-align: center;
+}

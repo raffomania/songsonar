@@ -1,9 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    {% block head %}{% endblock %}
-  </head>
-  <body>
-    {% block body %}{% endblock %}
-  </body>
+
+<head>
+  <link rel="stylesheet" href="/main.css" />
+  <title>Song Sonar</title>
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <div class="flex flex-wrap justify-center">
+    <img src="/logo.svg" alt="Image of a submarine" class="logo" />
+    <div class="content">
+      {% block body %}{% endblock %}
+    </div>
+  </div>
+  <div class="flex justify-center mt-16">
+    <span>
+      Made by <a href="https://www.rafa.ee">rafael</a> - <a href="https://github.com/raffomania/songsonar">
+        source code
+      </a>
+    </span>
+  </div>
+</body>
+
 </html>

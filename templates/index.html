@@ -1,4 +1,44 @@
-{% extends "_base.html" %} 
+{% extends "_base.html" %}
+
 {% block body %}
-    <a href="{{ login_url }}">Log in using spotify</a>
+<h1>Welcome to Song Sonar!</h1>
+<h2>New releases of artists you follow</h2>
+
+<p>
+    Never miss a release again. Every friday, Song Sonar gathers all new releases of artists you follow in a
+    spotify playlist, just for you.
+</p>
+<p>
+    Get your own Song Sonar in two clicks:
+</p>
+
+<h3 class="text-center mt-16">
+    <a class="btn" href="{{ login_url }}">Connect with spotify</a>
+</h3>
+
+<h3 class="mt-16">
+    Play <em>all</em> the releases
+</h3>
+
+<p>
+    There is no song limit - your Song Sonar playlist will contain every release by every artist you follow.
+</p>
+
+<h3>
+    Fresh tunes every friday
+</h3>
+
+<p>
+    Song Sonar is updated every friday, just like Release Radar. Songs from the previous week will be removed from your
+    playlist, so be sure to save the bangers!
+</p>
+
+<h3>
+    Free as in freedom
+</h3>
+
+<p>
+    Song Sonar is open source software. You can install it on your own machine, hack the code or just use the
+    free service hosted on <a href="https://songsonar.rocks">songsonar.rocks</a>.
+</p>
 {% endblock %}

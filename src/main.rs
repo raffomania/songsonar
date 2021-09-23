@@ -13,5 +13,14 @@ use routes::index::index;
 #[launch]
 fn rocket() -> _ {
     pretty_env_logger::init();
-    rocket::build().mount("/", routes![index, auth::spotify_connected])
+    rocket::build().mount(
+        "/",
+        routes![
+            index,
+            auth::spotify_connected,
+            routes::public::styles,
+            routes::public::logo,
+            routes::public::favicon
+        ],
+    )
 }
