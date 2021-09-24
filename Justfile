@@ -4,6 +4,15 @@ set dotenv-load := true
 run *args:
     cargo run {{args}}
 
+# Reset the database, then run the application
+run-reset *args:
+    just reset
+    cargo run {{args}}
+
+# Remove all data from the database, then run migrations
+reset:
+    sqlx db reset -y
+
 # Watch for something
 # E.g. `just watch run --release` or `just watch test`
 watch *args:

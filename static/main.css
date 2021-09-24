@@ -41,9 +41,9 @@ a {
 }
 
 .btn {
-  border-radius: 3px;
+  border-radius: 2em;
   border: 1px solid #00fc88;
-  padding: 1em;
+  padding: 1em 2em;
 }
 
 @keyframes hover {
