@@ -15,7 +15,7 @@ debug = false
 
 [dependencies]
 rocket = { version = "0.5.0-rc.1", features = [ "tls", "secrets" ] }
-sqlx = { version = "0.5.7", features = [ "runtime-tokio-native-tls", "postgres", "macros", "chrono", "uuid", "migrate" ] }
+sqlx = { version = "0.5.7", features = [ "runtime-tokio-native-tls", "postgres", "macros", "chrono", "migrate" ] }
 tokio = { version = "1", features = ["rt", "process"] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
 chrono = { version = "0.4", features = [ "serde" ] }
@@ -24,7 +24,6 @@ pretty_env_logger = "0.4"
 thiserror = "1"
 anyhow = "1"
 aspotify = "0.7.0"
-askama = { git = "https://github.com/djc/askama.git", branch = "main", features = ["with-rocket", "mime", "mime_guess"] }
+askama = { git = "https://github.com/djc/askama.git", branch = "main", features = ["with-rocket"] }
 askama_rocket = { git = "https://github.com/djc/askama.git", branch = "main" }
-serde = "1.0.130"
-serde_json = "1.0.68"
+miniserde = "0.1.15"

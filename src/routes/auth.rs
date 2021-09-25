@@ -90,9 +90,7 @@ pub async fn spotify_connected(
     };
     let mut session_cookie = Cookie::new(
         crate::cookies::SESSION,
-        serde_json::to_string(&session)
-            .context("Could not serialize session")
-            .context(format!("{:?}", session))?,
+        crate::cookies::Session::to_string(session),
     );
     session_cookie.set_secure(true);
     cookies.add_private(session_cookie);

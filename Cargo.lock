@@ -1071,10 +1071,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "mini-internal"
+version = "0.1.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac2f0e3cdd28b81bf077f464771717698e7ae3f0321c0086dd7ad241d6085ce7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c835948974f68e0bd58636fc6c5b1fbff7b297e3046f11b3b3c18bbac012c6d"
+
+[[package]]
+name = "miniserde"
+version = "0.1.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a116a35523bbd5b1712cefda270a03d1481263a114b6705cb1f02692651f76f"
+dependencies = [
+ "itoa",
+ "mini-internal",
+ "ryu",
+]
 
 [[package]]
 name = "mio"
@@ -1845,10 +1867,9 @@ dependencies = [
  "aspotify",
  "chrono",
  "log",
+ "miniserde",
  "pretty_env_logger",
  "rocket",
- "serde",
- "serde_json",
  "sqlx",
  "thiserror",
  "tokio",
@@ -1936,7 +1957,6 @@ dependencies = [
  "thiserror",
  "tokio-stream",
  "url",
- "uuid",
  "whoami",
 ]
 
