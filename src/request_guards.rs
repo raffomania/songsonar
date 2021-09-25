@@ -1,12 +1,16 @@
+use chrono::Utc;
 use rocket::{
-    http::Status,
+    http::{CookieJar, Status},
     outcome::{try_outcome, IntoOutcome},
     request::{FromRequest, Outcome},
     State,
 };
 use sqlx::Postgres;
 
-use crate::basics::*;
+use crate::{
+    basics::*,
+    cookies::{self, Session},
+};
 
 pub struct RequestUri(pub String);
 
@@ -18,6 +22,31 @@ impl<'r> FromRequest<'r> for RequestUri {
         request: &'r rocket::Request<'_>,
     ) -> Outcome<Self, Self::Error> {
         Outcome::Success(RequestUri(request.uri().to_string()))
+    }
+}
+
+#[derive(Debug)]
+pub struct LoggedInUser(Session);
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for LoggedInUser {
+    type Error = ();
+
+    async fn from_request(
+        request: &'r rocket::Request<'_>,
+    ) -> Outcome<Self, Self::Error> {
+        let cookies = try_outcome!(request
+            .guard::<&CookieJar>()
+            .await
+            .map_failure(|_| (Status::InternalServerError, ())));
+
+        let maybe_user: Option<LoggedInUser> = cookies
+            .get_private(cookies::SESSION)
+            .and_then(|s| cookies::Session::from_str(s.value()).ok())
+            .filter(|s: &Session| s.expires > Utc::now())
+            .map(|s| LoggedInUser(s));
+
+        maybe_user.or_forward(())
     }
 }
 

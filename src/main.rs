@@ -11,8 +11,6 @@ mod spotify;
 mod storage;
 
 use crate::basics::*;
-use routes::auth;
-use routes::index::index;
 use sqlx::postgres::PgPoolOptions;
 
 #[rocket::main]
@@ -29,8 +27,9 @@ async fn main() -> Result<()> {
         .mount(
             "/",
             routes![
-                index,
-                auth::spotify_connected,
+                routes::index::index,
+                routes::index::logged_in,
+                routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,
                 routes::public::favicon
