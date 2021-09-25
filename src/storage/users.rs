@@ -7,7 +7,7 @@ pub async fn insert_user(tx: &mut Transaction<'_>, user: User) -> Result<User> {
         r#"insert into users
         (spotify_id, playlist_id, access_token, refresh_token, weeks_in_playlist)
         values ($1, $2, $3, $4, $5)
-        returning spotify_id, playlist_id, access_token, refresh_token, weeks_in_playlist
+        returning *
     "#,
     user.spotify_id,
     user.playlist_id,

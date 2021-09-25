@@ -73,7 +73,8 @@ pub async fn spotify_connected(
                     playlist_id: None,
                     access_token,
                     refresh_token,
-                    weeks_in_playlist: 1,
+                    weeks_in_playlist: Some(1),
+                    can_read_private_playlists: None,
                 },
             )
             .await?;
