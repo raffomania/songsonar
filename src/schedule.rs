@@ -3,9 +3,7 @@ use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
 pub async fn schedule_updates() {
     let mut interval = friday_midnight_interval();
     loop {
-        println!("{:?} before", interval);
         interval.tick().await;
-        println!("{:?} after", interval);
     }
 }
 

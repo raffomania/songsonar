@@ -27,3 +27,5 @@ aspotify = "0.7.0"
 askama = { git = "https://github.com/djc/askama.git", branch = "main", features = ["with-rocket"] }
 askama_rocket = { git = "https://github.com/djc/askama.git", branch = "main" }
 miniserde = "0.1.15"
+sentry = { version = "0.23.0", features = ["log"] }
+git-version = "0.3.5"

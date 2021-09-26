@@ -8,6 +8,7 @@ mod request_guards;
 mod routes;
 mod schedule;
 mod schemas;
+mod sentry;
 mod spotify;
 mod storage;
 
@@ -16,7 +17,10 @@ use sqlx::postgres::PgPoolOptions;
 
 #[rocket::main]
 async fn main() -> Result<()> {
-    pretty_env_logger::init();
+    init_logger_with_sentry();
+
+    let _sentry = sentry::init();
+
     let database_url = std::env::var("DATABASE_URL")
         .expect("Please set the DATABASE_URL environment variable.");
     let pool = PgPoolOptions::new()
@@ -44,4 +48,23 @@ async fn main() -> Result<()> {
         .launch()
         .await
         .context("Could not launch rocket")
+}
+
+/// Create a new logger instance, wrap it with a sentry listener and set the
+/// wrapper as the new global logging instance.
+fn init_logger_with_sentry() {
+    let mut log_builder = pretty_env_logger::formatted_builder();
+
+    log_builder.parse_filters(
+        &std::env::var("RUST_LOG")
+            .expect("Please set the RUST_LOG environment variable"),
+    );
+    let logger = log_builder.build();
+    let max_level = logger.filter();
+
+    let sentry_logger = sentry::get_logger(logger);
+
+    log::set_boxed_logger(Box::new(sentry_logger))
+        .expect("Could not initialize logger");
+    log::set_max_level(max_level);
 }
