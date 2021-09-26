@@ -6,6 +6,7 @@ mod cookies;
 mod errors;
 mod request_guards;
 mod routes;
+mod schedule;
 mod schemas;
 mod spotify;
 mod storage;
@@ -22,6 +23,10 @@ async fn main() -> Result<()> {
         .max_connections(10)
         .connect(&database_url)
         .await?;
+
+    tokio::spawn(async {
+        schedule::schedule_updates().await;
+    });
 
     rocket::build()
         .mount(

@@ -23,3 +23,6 @@ watch *args:
 local-cert:
     mkdir -p target
     mkcert -cert-file target/localhost.crt -key-file target/localhost.key example.com "*.example.com" localhost 127.0.0.1 ::1 $(hostname)
+
+test *args:
+    cargo test -- -q {{args}}

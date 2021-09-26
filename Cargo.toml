@@ -16,7 +16,7 @@ debug = false
 [dependencies]
 rocket = { version = "0.5.0-rc.1", features = [ "tls", "secrets" ] }
 sqlx = { version = "0.5.7", features = [ "runtime-tokio-native-tls", "postgres", "macros", "chrono", "migrate" ] }
-tokio = { version = "1", features = ["rt", "process"] }
+tokio = { version = "1", features = ["rt", "time"] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
 chrono = { version = "0.4", features = [ "serde" ] }
 log = "0.4"
