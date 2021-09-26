@@ -23,6 +23,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres/songsonar-ci
 
@@ -38,11 +40,13 @@ jobs:
           override: true
           components: rustfmt, clippy
 
+      # - uses: Swatinem/rust-cache@v1
+
       - name: Install sqlx-cli
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: sqlx-cli
+          args: sqlx-cli --no-default-features --features postgres
 
       - name: Run migrations
         run: sqlx database reset -y
