@@ -11,6 +11,20 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         rust: [stable, nightly]
+    services:
+      # Create a postgres instance for sqlx-macros to work
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost/songsonar-ci
 
     steps:
       - name: Checkout code
@@ -23,6 +37,14 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: rustfmt, clippy
+
+      - name: Install sqlx-cli
+        uses: actions-rs/cargo@v1
+        with:
+          command: install sqlx-cli
+
+      - name: Run migrations
+        run: sqlx database reset -y
 
       - name: cargo build
         uses: actions-rs/cargo@v1
