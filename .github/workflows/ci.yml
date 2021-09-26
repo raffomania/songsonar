@@ -41,7 +41,8 @@ jobs:
       - name: Install sqlx-cli
         uses: actions-rs/cargo@v1
         with:
-          command: install sqlx-cli
+          command: install
+          args: sqlx-cli
 
       - name: Run migrations
         run: sqlx database reset -y
