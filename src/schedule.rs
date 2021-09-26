@@ -26,12 +26,12 @@ fn next_friday_midnight(now: DateTime<Utc>) -> Duration {
     if days_until_friday < 0 {
         days_until_friday += 7;
     }
-    let until_friday = Duration::days(days_until_friday.into());
+    let until_friday = Duration::days(days_until_friday);
 
     let tomorrow_midnight = (now + Duration::days(1)).date().and_hms(0, 0, 0);
     let until_tomorrow_midnight = tomorrow_midnight.signed_duration_since(now);
 
-    return until_friday + until_tomorrow_midnight;
+    until_friday + until_tomorrow_midnight
 }
 
 #[cfg(test)]

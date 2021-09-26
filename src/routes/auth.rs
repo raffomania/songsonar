@@ -29,7 +29,7 @@ pub async fn spotify_connected(
     );
     let state = cookies
         .get_private(cookies::OAUTH_STATE)
-        .ok_or(anyhow!("missing state cookie"))?;
+        .ok_or_else(|| anyhow!("missing state cookie"))?;
     let state = state.value();
     let client = spotify::get_client();
     client
@@ -49,7 +49,7 @@ pub async fn spotify_connected(
     let refresh_token = client
         .refresh_token()
         .await
-        .ok_or(anyhow!("Expected to find a refresh token"))?;
+        .ok_or_else(|| anyhow!("Expected to find a refresh token"))?;
 
     let existing_user = fetch_user(&mut tx, &spotify_id).await;
     match existing_user {

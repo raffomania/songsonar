@@ -44,7 +44,7 @@ impl<'r> FromRequest<'r> for LoggedInUser {
             .get_private(cookies::SESSION)
             .and_then(|s| cookies::Session::from_str(s.value()).ok())
             .filter(|s: &Session| s.expires > Utc::now())
-            .map(|s| LoggedInUser(s));
+            .map(LoggedInUser);
 
         maybe_user.or_forward(())
     }
@@ -67,11 +67,7 @@ impl<'r> FromRequest<'r> for Transaction<'r> {
                 anyhow!("Failed to get DB pool").into()
             )));
 
-        let tx = pool
-            .begin()
-            .await
-            .map(|tx| Transaction(tx))
-            .map_err(|e| AppError::from(e));
+        let tx = pool.begin().await.map(Transaction).map_err(AppError::from);
         tx.into_outcome(Status::InternalServerError)
     }
 }

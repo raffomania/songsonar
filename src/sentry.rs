@@ -5,10 +5,7 @@ use sentry::ClientInitGuard;
 /// Wrap the given logger with a sentry listener that forwards log entries to
 /// sentry.
 pub fn get_logger(logger: Logger) -> impl Log {
-    let sentry_logger =
-        sentry::integrations::log::SentryLogger::with_dest(logger);
-
-    sentry_logger
+    sentry::integrations::log::SentryLogger::with_dest(logger)
 }
 
 /// Initialize sentry.
