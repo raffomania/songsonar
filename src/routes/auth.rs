@@ -52,7 +52,7 @@ pub async fn spotify_connected(
         .ok_or_else(|| anyhow!("Expected to find a refresh token"))?;
 
     let existing_user = fetch_user(&mut tx, &spotify_id).await;
-    match existing_user {
+    let _user = match existing_user {
         Ok(user) => {
             update_user(
                 &mut tx,
@@ -63,7 +63,7 @@ pub async fn spotify_connected(
                     ..user
                 },
             )
-            .await?;
+            .await?
         }
         Err(_) => {
             insert_user(
@@ -77,9 +77,9 @@ pub async fn spotify_connected(
                     can_read_private_playlists: None,
                 },
             )
-            .await?;
+            .await?
         }
-    }
+    };
 
     tx.0.commit().await?;
 
@@ -94,6 +94,8 @@ pub async fn spotify_connected(
     );
     session_cookie.set_secure(true);
     cookies.add_private(session_cookie);
+
+    crate::spotify::update_playlist(client).await?;
 
     Ok(Redirect::to(uri!("/")))
 }
