@@ -37,7 +37,8 @@ async fn main() -> Result<()> {
             "/",
             routes![
                 routes::index::index,
-                routes::index::logged_in,
+                routes::index::logged_in_index,
+                routes::dashboard::dashboard,
                 routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,

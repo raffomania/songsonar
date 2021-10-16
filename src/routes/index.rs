@@ -1,21 +1,17 @@
 use askama::Template;
-use rocket::http::CookieJar;
+use rocket::{http::CookieJar, response::Redirect};
 
 use crate::request_guards::LoggedInUser;
-
-#[derive(Template)]
-#[template(path = "logged_in.html")]
-pub struct LoggedInTemplate {}
-
-#[get("/")]
-pub fn logged_in(_user: LoggedInUser) -> LoggedInTemplate {
-    LoggedInTemplate {}
-}
 
 #[derive(Template)]
 #[template(path = "index.html")]
 pub struct IndexTemplate {
     login_url: String,
+}
+
+#[get("/")]
+pub fn logged_in_index(_user: LoggedInUser) -> Redirect {
+    Redirect::to(uri!(crate::routes::dashboard::dashboard()))
 }
 
 #[get("/", rank = 1)]
