@@ -26,3 +26,6 @@ local-cert:
 
 test *args:
     cargo test -- -q {{args}}
+
+lint:
+    cargo clippy -- -D warnings
