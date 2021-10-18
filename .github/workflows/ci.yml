@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        rust: [stable, nightly]
+        rust: [stable, nightly-2021-10-15]
     services:
       # Create a postgres instance for sqlx-macros to work
       postgres:
