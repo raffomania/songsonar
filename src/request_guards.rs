@@ -26,7 +26,7 @@ impl<'r> FromRequest<'r> for RequestUri {
 }
 
 #[derive(Debug)]
-pub struct LoggedInUser(Session);
+pub struct LoggedInUser(pub Session);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for LoggedInUser {

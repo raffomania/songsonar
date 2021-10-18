@@ -39,6 +39,7 @@ async fn main() -> Result<()> {
                 routes::index::index,
                 routes::index::logged_in_index,
                 routes::dashboard::dashboard,
+                routes::dashboard::update_playlist,
                 routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,
