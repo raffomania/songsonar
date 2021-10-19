@@ -36,7 +36,10 @@ pub async fn fetch_user(
     Ok(user)
 }
 
-pub async fn update_user(tx: &mut Transaction<'_>, user: User) -> Result<User> {
+pub async fn update_user(
+    tx: &mut Transaction<'_>,
+    user: &User,
+) -> Result<User> {
     let user = query_as!(
         User,
         r#"update users

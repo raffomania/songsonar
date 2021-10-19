@@ -52,14 +52,26 @@ pub async fn spotify_connected(
         .ok_or_else(|| anyhow!("Expected to find a refresh token"))?;
 
     let existing_user = fetch_user(&mut tx, &spotify_id).await;
-    let _user = match existing_user {
+
+    let playlist_id = if let Some(id) = existing_user
+        .as_ref()
+        .ok()
+        .and_then(|u| u.playlist_id.as_ref())
+    {
+        id.clone()
+    } else {
+        spotify::create_playlist(&client).await?
+    };
+
+    let user = match existing_user {
         Ok(user) => {
             update_user(
                 &mut tx,
-                User {
+                &User {
                     spotify_id: spotify_id.clone(),
                     access_token,
                     refresh_token,
+                    playlist_id: Some(playlist_id.clone()),
                     ..user
                 },
             )
@@ -70,7 +82,7 @@ pub async fn spotify_connected(
                 &mut tx,
                 User {
                     spotify_id: spotify_id.clone(),
-                    playlist_id: None,
+                    playlist_id: Some(playlist_id.clone()),
                     access_token,
                     refresh_token,
                     weeks_in_playlist: Some(1),
@@ -80,7 +92,6 @@ pub async fn spotify_connected(
             .await?
         }
     };
-
     tx.0.commit().await?;
 
     // todo use revokable sessions for this
@@ -95,7 +106,10 @@ pub async fn spotify_connected(
     session_cookie.set_secure(true);
     cookies.add_private(session_cookie);
 
-    crate::spotify::update_playlist(client).await?;
+    let weeks_in_playlist = user.weeks_in_playlist.unwrap_or(1);
+
+    crate::spotify::update_playlist(client, weeks_in_playlist, &playlist_id)
+        .await?;
 
     Ok(Redirect::to(uri!(crate::routes::dashboard::dashboard())))
 }

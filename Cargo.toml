@@ -18,7 +18,7 @@ rocket = { version = "0.5.0-rc.1", features = [ "tls", "secrets" ] }
 sqlx = { version = "0.5.7", features = [ "runtime-tokio-native-tls", "postgres", "macros", "chrono", "migrate" ] }
 tokio = { version = "1", features = ["rt", "time"] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
-chrono = { version = "0.4", features = [ "serde" ] }
+chrono = { version = "0.4.19", features = [ "serde" ] }
 log = "0.4"
 pretty_env_logger = "0.4"
 thiserror = "1"
@@ -29,3 +29,6 @@ askama_rocket = { git = "https://github.com/djc/askama.git", branch = "main" }
 miniserde = "0.1.15"
 sentry = { version = "0.23.0", features = ["log"] }
 git-version = "0.3.5"
+comfy-table = "4.1.1"
+
+[features]

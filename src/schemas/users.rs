@@ -1,6 +1,6 @@
 use sqlx::FromRow;
 
-#[derive(FromRow, Debug)]
+#[derive(FromRow, Debug, Clone)]
 pub struct User {
     pub spotify_id: String,
     pub playlist_id: Option<String>,

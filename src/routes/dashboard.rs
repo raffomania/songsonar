@@ -34,8 +34,22 @@ pub async fn update_playlist(
     let client = crate::spotify::get_client();
     let user =
         storage::users::fetch_user(&mut tx, &session.0.spotify_id).await?;
-    client.set_refresh_token(Some(user.refresh_token)).await;
-    spotify::update_playlist(client).await?;
+    client
+        .set_refresh_token(Some(user.refresh_token.clone()))
+        .await;
+
+    let playlist_id = if let Some(id) = user.playlist_id {
+        id
+    } else {
+        spotify::create_playlist(&client).await?
+    };
+
+    spotify::update_playlist(
+        client,
+        user.weeks_in_playlist.unwrap_or(1),
+        &playlist_id,
+    )
+    .await?;
     Ok(Redirect::to(uri!(dashboard())))
 }
 
