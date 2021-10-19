@@ -97,5 +97,5 @@ pub async fn spotify_connected(
 
     crate::spotify::update_playlist(client).await?;
 
-    Ok(Redirect::to(uri!("/")))
+    Ok(Redirect::to(uri!(crate::routes::dashboard::dashboard())))
 }
