@@ -13,12 +13,8 @@ pub fn get_logger(logger: Logger) -> impl Log {
 /// the app is running, because sentry only captures events until the guard
 /// is dropped.
 pub fn init() -> ClientInitGuard {
-    sentry::init((
-        std::env::var("SENTRY_DSN")
-            .expect("Please set the SENTRY_DSN environment variable"),
-        sentry::ClientOptions {
-            release: Some(git_version::git_version!().into()),
-            ..Default::default()
-        },
-    ))
+    sentry::init(sentry::ClientOptions {
+        release: Some(git_version::git_version!().into()),
+        ..Default::default()
+    })
 }
