@@ -3,7 +3,7 @@ use aspotify::{Client, PlaylistItemType};
 use crate::basics::*;
 
 pub async fn create_playlist(client: &Client) -> Result<String> {
-    let name = "Song Sonar";
+    let name = "Song Sonar".to_string();
     let description = "New releases of artists you follow";
 
     #[cfg(debug_assertions)]

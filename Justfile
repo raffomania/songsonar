@@ -18,6 +18,9 @@ reset:
 watch *args:
     cargo watch --shell 'just {{ args }}'
 
+build *args:
+    cargo build --release 
+
 # Create a self-signed certificate for testing
 # See .env.example for configuring the app to use it
 local-cert:
@@ -28,4 +31,5 @@ test *args:
     cargo test -- -q {{args}}
 
 lint:
+    cargo clippy --release -- -D warnings
     cargo clippy -- -D warnings

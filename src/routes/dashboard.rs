@@ -1,9 +1,8 @@
 use askama::Template;
 use rocket::response::Redirect;
 
-use crate::request_guards::{LoggedInUser, Transaction};
-use crate::spotify;
-use crate::{basics::*, storage};
+use crate::basics::*;
+use crate::request_guards::LoggedInUser;
 
 #[derive(Template)]
 #[template(path = "dashboard.html")]
@@ -29,13 +28,14 @@ pub fn dashboard(_user: LoggedInUser) -> DebugDashboardTemplate {
 #[get("/dashboard/update_playlist")]
 pub async fn update_playlist(
     session: LoggedInUser,
-    mut tx: Transaction<'_>,
+    mut tx: crate::request_guards::Transaction<'_>,
 ) -> Result<Redirect, AppError> {
     use crate::schemas::users::User;
 
     let client = crate::spotify::get_client()?;
     let user =
-        storage::users::fetch_user(&mut tx, &session.0.spotify_id).await?;
+        crate::storage::users::fetch_user(&mut tx, &session.0.spotify_id)
+            .await?;
     client
         .set_refresh_token(Some(user.refresh_token.clone()))
         .await;
@@ -43,8 +43,8 @@ pub async fn update_playlist(
     let playlist_id = if let Some(id) = user.playlist_id {
         id
     } else {
-        let playlist_id = spotify::create_playlist(&client).await?;
-        storage::users::update_user(
+        let playlist_id = crate::spotify::create_playlist(&client).await?;
+        crate::storage::users::update_user(
             &mut tx,
             &User {
                 playlist_id: Some(playlist_id.clone()),
@@ -57,7 +57,7 @@ pub async fn update_playlist(
 
     tx.0.commit().await?;
 
-    spotify::update_playlist(
+    crate::spotify::update_playlist(
         &client,
         user.weeks_in_playlist.unwrap_or(1),
         &playlist_id,
@@ -69,7 +69,7 @@ pub async fn update_playlist(
 #[cfg(not(debug_assertions))]
 #[get("/dashboard/update_playlist")]
 pub async fn update_playlist(
-    session: LoggedInUser,
+    _session: LoggedInUser,
 ) -> Result<Redirect, AppError> {
     Ok(Redirect::to(uri!(dashboard())))
 }
