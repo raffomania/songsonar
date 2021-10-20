@@ -1,6 +1,7 @@
 use askama::Template;
 use rocket::{http::CookieJar, response::Redirect};
 
+use crate::basics::*;
 use crate::request_guards::LoggedInUser;
 
 #[derive(Template)]
@@ -15,8 +16,8 @@ pub fn logged_in_index(_user: LoggedInUser) -> Redirect {
 }
 
 #[get("/", rank = 1)]
-pub fn index(cookies: &CookieJar<'_>) -> IndexTemplate {
-    let login_url = crate::spotify::get_authorization_url(cookies);
+pub fn index(cookies: &CookieJar<'_>) -> Result<IndexTemplate, AppError> {
+    let login_url = crate::spotify::get_authorization_url(cookies)?;
 
-    IndexTemplate { login_url }
+    Ok(IndexTemplate { login_url })
 }

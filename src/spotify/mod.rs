@@ -1,5 +1,4 @@
 use aspotify::{AlbumGroup, Artist, Client, Market};
-pub use auth::{get_authorization_url, get_client};
 use chrono::{Duration, Utc};
 
 use crate::{basics::*, get_all_cursor_pages, get_all_pages};
@@ -8,6 +7,7 @@ mod auth;
 mod playlist;
 mod util;
 
+pub use auth::{get_authorization_url, get_client};
 pub use playlist::create_playlist;
 
 pub async fn update_playlist(

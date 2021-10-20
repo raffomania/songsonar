@@ -31,7 +31,7 @@ pub async fn update_playlist(
     session: LoggedInUser,
     mut tx: Transaction<'_>,
 ) -> Result<Redirect, AppError> {
-    let client = crate::spotify::get_client();
+    let client = crate::spotify::get_client()?;
     let user =
         storage::users::fetch_user(&mut tx, &session.0.spotify_id).await?;
     client

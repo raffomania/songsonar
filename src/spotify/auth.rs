@@ -1,21 +1,22 @@
 use aspotify::{Client, Scope};
 use rocket::http::{Cookie, CookieJar, SameSite};
 
+use crate::basics::*;
 use crate::cookies;
 
-pub fn get_client() -> Client {
-    let creds = aspotify::ClientCredentials::from_env().expect(
+pub fn get_client() -> Result<Client> {
+    let creds = aspotify::ClientCredentials::from_env().context(
         "Please provide CLIENT_ID and CLIENT_SECRET env vars with your spotify credentials."
-    );
+    )?;
 
-    Client::new(creds)
+    Ok(Client::new(creds))
 }
 
 /// Get the authorization URL with a random state parameter.
 /// If the state is not saved in a cookie yet, generate a new one
 /// and persist it.
-pub fn get_authorization_url(cookies: &CookieJar<'_>) -> String {
-    let client_id = &get_client().credentials.id;
+pub fn get_authorization_url(cookies: &CookieJar<'_>) -> Result<String> {
+    let client_id = &get_client()?.credentials.id;
     let scopes = vec![
         Scope::UserFollowRead,
         Scope::PlaylistModifyPrivate,
@@ -60,5 +61,5 @@ pub fn get_authorization_url(cookies: &CookieJar<'_>) -> String {
         url
     };
 
-    url
+    Ok(url)
 }

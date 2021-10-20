@@ -31,7 +31,7 @@ pub async fn spotify_connected(
         .get_private(cookies::OAUTH_STATE)
         .ok_or_else(|| anyhow!("missing state cookie"))?;
     let state = state.value();
-    let client = spotify::get_client();
+    let client = spotify::get_client()?;
     client
         .redirected(&url, state)
         .await

@@ -3,6 +3,7 @@ extern crate rocket;
 
 mod basics;
 mod cookies;
+mod db;
 mod errors;
 mod request_guards;
 mod routes;
@@ -12,8 +13,7 @@ mod sentry;
 mod spotify;
 mod storage;
 
-use crate::basics::*;
-use sqlx::postgres::PgPoolOptions;
+use crate::{basics::*, db::create_db_pool};
 
 #[rocket::main]
 async fn main() -> Result<()> {
@@ -21,12 +21,7 @@ async fn main() -> Result<()> {
 
     let _sentry = sentry::init();
 
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("Please set the DATABASE_URL environment variable.");
-    let pool = PgPoolOptions::new()
-        .max_connections(10)
-        .connect(&database_url)
-        .await?;
+    let pool = create_db_pool().await.unwrap();
 
     tokio::spawn(async {
         schedule::schedule_updates().await;
