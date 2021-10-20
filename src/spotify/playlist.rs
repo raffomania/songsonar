@@ -3,9 +3,15 @@ use aspotify::{Client, PlaylistItemType};
 use crate::basics::*;
 
 pub async fn create_playlist(client: &Client) -> Result<String> {
+    let name = "Song Sonar";
+    let description = "New releases of artists you follow";
+
+    #[cfg(debug_assertions)]
+    let name = format!("{} dev", name);
+
     client
         .playlists()
-        .create_playlist("Song Sonar dev", false, false, "")
+        .create_playlist(&name, false, false, description)
         .await
         .context("Could not create playlist")
         .map(|res| res.data.id)

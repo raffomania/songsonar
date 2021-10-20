@@ -1,14 +1,76 @@
+use aspotify::Client;
 use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
+use sentry::integrations::anyhow::capture_anyhow;
+use sqlx::{Pool, Postgres};
 
-pub async fn schedule_updates() {
+use crate::basics::*;
+
+use crate::{
+    db::create_db_pool, request_guards::Transaction, spotify, storage,
+};
+
+pub async fn schedule_updates() -> Result<()> {
     let (delay, period) = friday_midnight_interval();
     let delay_seconds = delay - tokio::time::Instant::now();
     let next_run = Utc::now() + Duration::from_std(delay_seconds).unwrap();
     log::info!("Next run scheduled at {}", next_run.to_rfc2822());
+
     let mut interval = tokio::time::interval_at(delay, period);
+
+    let client = spotify::get_client().unwrap();
+    let pool = create_db_pool().await.unwrap();
+
     loop {
         interval.tick().await;
+
+        update_all_playlists(&pool, &client)
+            .await
+            .as_ref()
+            .map_err(capture_anyhow)
+            .ok();
     }
+}
+
+async fn update_all_playlists(
+    pool: &Pool<Postgres>,
+    client: &Client,
+) -> Result<()> {
+    let mut tx = Transaction(pool.begin().await?);
+    let users = storage::users::list_users(&mut tx).await?;
+    tx.0.commit().await?;
+
+    log::info!("Found {} users to update", users.len());
+
+    for user in users {
+        log::debug!("updating user {:?}", user);
+
+        client.set_refresh_token(Some(user.refresh_token)).await;
+        client
+            .set_current_access_token(
+                user.access_token,
+                std::time::Instant::now(),
+            )
+            .await;
+
+        let playlist_id = if let Some(id) = user.playlist_id {
+            id
+        } else {
+            capture_anyhow(&anyhow!("Missing playlist for user!"));
+            continue;
+        };
+
+        spotify::update_playlist(
+            client,
+            user.weeks_in_playlist.unwrap_or(1),
+            &playlist_id,
+        )
+        .await
+        .as_ref()
+        .map_err(capture_anyhow)
+        .ok();
+    }
+
+    Ok(())
 }
 
 fn friday_midnight_interval() -> (tokio::time::Instant, std::time::Duration) {

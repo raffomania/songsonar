@@ -31,6 +31,8 @@ pub async fn update_playlist(
     session: LoggedInUser,
     mut tx: Transaction<'_>,
 ) -> Result<Redirect, AppError> {
+    use crate::schemas::users::User;
+
     let client = crate::spotify::get_client()?;
     let user =
         storage::users::fetch_user(&mut tx, &session.0.spotify_id).await?;
@@ -41,11 +43,22 @@ pub async fn update_playlist(
     let playlist_id = if let Some(id) = user.playlist_id {
         id
     } else {
-        spotify::create_playlist(&client).await?
+        let playlist_id = spotify::create_playlist(&client).await?;
+        storage::users::update_user(
+            &mut tx,
+            &User {
+                playlist_id: Some(playlist_id.clone()),
+                ..user
+            },
+        )
+        .await?;
+        playlist_id
     };
 
+    tx.0.commit().await?;
+
     spotify::update_playlist(
-        client,
+        &client,
         user.weeks_in_playlist.unwrap_or(1),
         &playlist_id,
     )

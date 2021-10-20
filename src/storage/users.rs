@@ -36,6 +36,13 @@ pub async fn fetch_user(
     Ok(user)
 }
 
+pub async fn list_users(tx: &mut Transaction<'_>) -> Result<Vec<User>> {
+    query_as!(User, r#"select * from users"#)
+        .fetch_all(&mut tx.0)
+        .await
+        .context("Could not fetch users")
+}
+
 pub async fn update_user(
     tx: &mut Transaction<'_>,
     user: &User,

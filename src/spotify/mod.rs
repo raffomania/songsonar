@@ -11,7 +11,7 @@ pub use auth::{get_authorization_url, get_client};
 pub use playlist::create_playlist;
 
 pub async fn update_playlist(
-    client: Client,
+    client: &Client,
     weeks_in_playlist: i16,
     playlist_id: &str,
 ) -> Result<()> {
@@ -71,7 +71,7 @@ pub async fn update_playlist(
 
     log::debug!("Found {} tracks", track_ids.len());
 
-    playlist::replace_playlists_items(&client, playlist_id, track_ids).await?;
+    playlist::replace_playlists_items(client, playlist_id, track_ids).await?;
 
     Ok(())
 }

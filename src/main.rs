@@ -23,11 +23,10 @@ async fn main() -> Result<()> {
 
     let pool = create_db_pool().await.unwrap();
 
-    tokio::spawn(async {
-        schedule::schedule_updates().await;
-    });
+    let scheduled_updates =
+        tokio::spawn(async { schedule::schedule_updates().await });
 
-    rocket::build()
+    let web_server = rocket::build()
         .mount(
             "/",
             routes![
@@ -43,9 +42,12 @@ async fn main() -> Result<()> {
             ],
         )
         .manage(pool)
-        .launch()
-        .await
-        .context("Could not launch rocket")
+        .launch();
+
+    tokio::select! {
+        res = scheduled_updates => res?,
+        res = web_server => res.context("Could not start rocket server"),
+    }
 }
 
 /// Create a new logger instance, wrap it with a sentry listener and set the
