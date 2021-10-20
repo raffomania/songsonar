@@ -15,6 +15,7 @@ pub fn get_logger(logger: Logger) -> impl Log {
 pub fn init() -> ClientInitGuard {
     sentry::init(sentry::ClientOptions {
         release: Some(git_version::git_version!().into()),
+        send_default_pii: false,
         ..Default::default()
     })
 }

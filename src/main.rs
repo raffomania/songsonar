@@ -43,7 +43,8 @@ async fn main() -> Result<()> {
                 routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,
-                routes::public::favicon
+                routes::public::favicon,
+                routes::public::privacy_policy
             ],
         )
         .manage(pool)
