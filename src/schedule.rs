@@ -1,14 +1,18 @@
 use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
 
 pub async fn schedule_updates() {
-    let mut interval = friday_midnight_interval();
+    let (delay, period) = friday_midnight_interval();
+    let delay_seconds = delay - tokio::time::Instant::now();
+    let next_run = Utc::now() + Duration::from_std(delay_seconds).unwrap();
+    log::info!("Next run scheduled at {}", next_run.to_rfc2822());
+    let mut interval = tokio::time::interval_at(delay, period);
     loop {
         interval.tick().await;
     }
 }
 
-fn friday_midnight_interval() -> tokio::time::Interval {
-    tokio::time::interval_at(
+fn friday_midnight_interval() -> (tokio::time::Instant, std::time::Duration) {
+    (
         tokio::time::Instant::now()
             + next_friday_midnight(Utc::now())
                 .to_std()
