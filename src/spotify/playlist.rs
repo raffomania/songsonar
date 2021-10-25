@@ -22,14 +22,22 @@ pub async fn replace_playlists_items(
     playlist_id: &str,
     playlist_items: Vec<String>,
 ) -> Result<()> {
-    for chunk in playlist_items.chunks(100) {
+    for (i, chunk) in playlist_items.chunks(100).enumerate() {
         let chunk = chunk
             .iter()
             .map(|id| PlaylistItemType::<&str, &str>::Track(id));
-        client
-            .playlists()
-            .replace_playlists_items(playlist_id, chunk)
-            .await?;
+
+        if i == 0 {
+            client
+                .playlists()
+                .replace_playlists_items(playlist_id, chunk)
+                .await?;
+        } else {
+            client
+                .playlists()
+                .add_to_playlist(playlist_id, chunk, None)
+                .await?;
+        }
     }
 
     Ok(())
