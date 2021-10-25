@@ -1,7 +1,7 @@
 use crate::basics::*;
 use chrono::{DateTime, Utc};
 use miniserde::{Deserialize, Serialize};
-use rocket::http::{CookieJar, Status};
+use rocket::http::{Cookie, CookieJar, Status};
 use rocket::outcome::{try_outcome, IntoOutcome};
 use rocket::request::{FromRequest, Outcome};
 
@@ -51,7 +51,7 @@ impl<'r> FromRequest<'r> for Session {
     async fn from_request(
         request: &'r rocket::Request<'_>,
     ) -> Outcome<Self, Self::Error> {
-        let cookies = try_outcome!(request
+        let cookies: &CookieJar = try_outcome!(request
             .guard::<&CookieJar>()
             .await
             .map_failure(|_| (Status::InternalServerError, ())));
@@ -60,6 +60,10 @@ impl<'r> FromRequest<'r> for Session {
             .get_private(SESSION)
             .and_then(|s| Session::from_str(s.value()).ok())
             .filter(|s: &Session| s.expires > Utc::now());
+
+        if maybe_user.is_none() {
+            cookies.remove_private(Cookie::named(SESSION));
+        }
 
         maybe_user.or_forward(())
     }
