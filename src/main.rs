@@ -14,8 +14,9 @@ mod sentry;
 mod spotify;
 mod storage;
 
-use args::{Command, StartOptions};
+use args::{Command, StartOptions, UpdatePlaylistOptions};
 use db::MIGRATOR;
+use request_guards::Transaction;
 
 use crate::{args::Args, basics::*, db::create_db_pool};
 
@@ -30,7 +31,35 @@ async fn main() -> Result<()> {
     match args.command.unwrap_or(Command::Start(StartOptions {})) {
         Command::Start(_) => start().await,
         Command::Migrate(_) => migrate().await,
+        Command::UpdatePlaylist(UpdatePlaylistOptions { user_id }) => {
+            update_playlist(user_id).await
+        }
     }
+}
+
+async fn update_playlist(user_id: String) -> Result<()> {
+    let pool = create_db_pool().await?;
+    let mut tx = Transaction(pool.begin().await?);
+    let client = crate::spotify::get_client()?;
+
+    let user = crate::storage::users::fetch_user(&mut tx, &user_id).await?;
+
+    client
+        .set_refresh_token(Some(user.refresh_token.clone()))
+        .await;
+
+    let playlist_id = user.playlist_id.unwrap();
+
+    tx.0.commit().await?;
+
+    crate::spotify::update_playlist(
+        &client,
+        user.weeks_in_playlist.unwrap_or(1),
+        &playlist_id,
+    )
+    .await?;
+
+    Ok(())
 }
 
 async fn migrate() -> Result<()> {
@@ -53,6 +82,7 @@ async fn start() -> Result<()> {
                 routes::index::logged_in_index,
                 routes::dashboard::dashboard,
                 routes::dashboard::update_playlist,
+                routes::dashboard::not_logged_in,
                 routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,

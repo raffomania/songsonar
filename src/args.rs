@@ -13,6 +13,7 @@ pub struct Args {
 pub enum Command {
     Migrate(MigrateOptions),
     Start(StartOptions),
+    UpdatePlaylist(UpdatePlaylistOptions),
 }
 
 #[derive(FromArgs)]
@@ -24,3 +25,11 @@ pub struct MigrateOptions {}
 #[argh(subcommand, name = "start")]
 /// Start the server
 pub struct StartOptions {}
+
+#[derive(FromArgs)]
+#[argh(subcommand, name = "update_playlist")]
+/// Update a specific playlist
+pub struct UpdatePlaylistOptions {
+    #[argh(positional)]
+    pub user_id: String,
+}
