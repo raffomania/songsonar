@@ -1,8 +1,7 @@
 use askama::Template;
 use rocket::{http::CookieJar, response::Redirect};
 
-use crate::basics::*;
-use crate::request_guards::LoggedInUser;
+use crate::{basics::*, cookies::Session};
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -11,7 +10,7 @@ pub struct IndexTemplate {
 }
 
 #[get("/")]
-pub fn logged_in_index(_user: LoggedInUser) -> Redirect {
+pub fn logged_in_index(_user: Session) -> Redirect {
     Redirect::to(uri!(crate::routes::dashboard::dashboard()))
 }
 
