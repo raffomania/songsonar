@@ -81,7 +81,6 @@ async fn start() -> Result<()> {
                 routes::index::index,
                 routes::index::logged_in_index,
                 routes::dashboard::dashboard,
-                routes::dashboard::update_playlist,
                 routes::dashboard::not_logged_in,
                 routes::auth::spotify_connected,
                 routes::public::styles,
