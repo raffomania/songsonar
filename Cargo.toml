@@ -30,5 +30,6 @@ miniserde = "0.1.15"
 sentry = { version = "0.23.0", features = ["log", "anyhow", "backtrace"] }
 git-version = "0.3.5"
 comfy-table = "4.1.1"
+argh = "0.1.6"
 
 [features]

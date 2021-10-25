@@ -1,6 +1,8 @@
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::{migrate::Migrator, postgres::PgPoolOptions, Pool, Postgres};
 
 use crate::basics::*;
+
+pub static MIGRATOR: Migrator = sqlx::migrate!();
 
 pub async fn create_db_pool() -> Result<Pool<Postgres>> {
     let database_url = std::env::var("DATABASE_URL")

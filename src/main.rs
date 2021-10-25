@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
+mod args;
 mod basics;
 mod cookies;
 mod db;
@@ -13,7 +14,10 @@ mod sentry;
 mod spotify;
 mod storage;
 
-use crate::{basics::*, db::create_db_pool};
+use args::{Command, StartOptions};
+use db::MIGRATOR;
+
+use crate::{args::Args, basics::*, db::create_db_pool};
 
 #[rocket::main]
 async fn main() -> Result<()> {
@@ -21,7 +25,22 @@ async fn main() -> Result<()> {
 
     let _sentry = sentry::init();
 
-    let pool = create_db_pool().await.unwrap();
+    let args: Args = argh::from_env();
+
+    match args.command.unwrap_or(Command::Start(StartOptions {})) {
+        Command::Start(_) => start().await,
+        Command::Migrate(_) => migrate().await,
+    }
+}
+
+async fn migrate() -> Result<()> {
+    let pool = create_db_pool().await?;
+
+    MIGRATOR.run(&pool).await.context("Error during migration")
+}
+
+async fn start() -> Result<()> {
+    let pool = create_db_pool().await?;
 
     let scheduled_updates =
         tokio::spawn(async { schedule::schedule_updates().await });
