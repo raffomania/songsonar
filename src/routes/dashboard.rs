@@ -1,14 +1,15 @@
+use crate::db::Transaction;
 use crate::{cookies, storage};
 use askama::Template;
 use rocket::http::{Cookie, CookieJar};
 use rocket::response::Redirect;
 
 use crate::basics::*;
-use crate::request_guards::Transaction;
+use crate::routes;
 
 #[get("/dashboard", rank = 1)]
 pub fn not_logged_in() -> Redirect {
-    Redirect::to(uri!("/"))
+    Redirect::to(uri!(routes::index::index()))
 }
 
 #[derive(Template)]
@@ -25,7 +26,7 @@ pub async fn dashboard(
         .await
         .map_err(|_| {
             cookies.remove_private(Cookie::named(crate::cookies::SESSION));
-            Redirect::to(uri!("/"))
+            Redirect::to(uri!(routes::index::index()))
         })?;
 
     Ok(DashboardTemplate {})

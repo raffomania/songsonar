@@ -15,8 +15,7 @@ mod spotify;
 mod storage;
 
 use args::{Command, StartOptions, UpdatePlaylistOptions};
-use db::MIGRATOR;
-use request_guards::Transaction;
+use db::{Transaction, MIGRATOR};
 
 use crate::{args::Args, basics::*, db::create_db_pool};
 

@@ -5,9 +5,8 @@ use sqlx::{Pool, Postgres};
 
 use crate::basics::*;
 
-use crate::{
-    db::create_db_pool, request_guards::Transaction, spotify, storage,
-};
+use crate::db::Transaction;
+use crate::{db::create_db_pool, spotify, storage};
 
 pub async fn schedule_updates() -> Result<()> {
     let (delay, period) = friday_midnight_interval();

@@ -1,4 +1,4 @@
-use crate::{basics::*, request_guards::Transaction, schemas::users::User};
+use crate::{basics::*, db::Transaction, schemas::users::User};
 use sqlx::query_as;
 
 pub async fn insert_user(tx: &mut Transaction, user: User) -> Result<User> {

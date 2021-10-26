@@ -1,4 +1,4 @@
-use crate::basics::*;
+use crate::{basics::*, db::Transaction};
 use chrono::{Duration, Utc};
 use rocket::{
     http::{Cookie, CookieJar},
@@ -8,7 +8,7 @@ use rocket::{
 
 use crate::{
     cookies,
-    request_guards::{RequestUri, Transaction},
+    request_guards::RequestUri,
     schemas::users::User,
     spotify,
     storage::users::{fetch_user, insert_user, update_user},
