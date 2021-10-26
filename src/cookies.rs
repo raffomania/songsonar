@@ -56,15 +56,15 @@ impl<'r> FromRequest<'r> for Session {
             .await
             .map_failure(|_| (Status::InternalServerError, ())));
 
-        let maybe_user: Option<Session> = cookies
+        let maybe_session: Option<Session> = cookies
             .get_private(SESSION)
             .and_then(|s| Session::from_str(s.value()).ok())
             .filter(|s: &Session| s.expires > Utc::now());
 
-        if maybe_user.is_none() {
+        if maybe_session.is_none() {
             cookies.remove_private(Cookie::named(SESSION));
         }
 
-        maybe_user.or_forward(())
+        maybe_session.or_forward(())
     }
 }

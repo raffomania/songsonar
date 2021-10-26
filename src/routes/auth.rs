@@ -108,8 +108,14 @@ pub async fn spotify_connected(
 
     let weeks_in_playlist = user.weeks_in_playlist.unwrap_or(1);
 
-    crate::spotify::update_playlist(&client, weeks_in_playlist, &playlist_id)
-        .await?;
+    tokio::spawn(async move {
+        crate::spotify::update_playlist(
+            &client,
+            weeks_in_playlist,
+            &playlist_id,
+        )
+        .await
+    });
 
     Ok(Redirect::to(uri!(crate::routes::dashboard::dashboard())))
 }
