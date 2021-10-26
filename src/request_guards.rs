@@ -21,10 +21,10 @@ impl<'r> FromRequest<'r> for RequestUri {
     }
 }
 
-pub struct Transaction<'request>(pub sqlx::Transaction<'request, Postgres>);
+pub struct Transaction(pub sqlx::Transaction<'static, Postgres>);
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for Transaction<'r> {
+impl<'r> FromRequest<'r> for Transaction {
     type Error = AppError;
 
     async fn from_request(

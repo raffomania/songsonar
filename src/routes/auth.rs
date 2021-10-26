@@ -17,7 +17,7 @@ use crate::{
 #[get("/spotify-connected")]
 pub async fn spotify_connected(
     cookies: &CookieJar<'_>,
-    mut tx: Transaction<'_>,
+    mut tx: Transaction,
     uri: RequestUri,
 ) -> Result<Redirect, AppError> {
     let url = uri.0;

@@ -1,7 +1,7 @@
 use crate::{basics::*, request_guards::Transaction, schemas::users::User};
 use sqlx::query_as;
 
-pub async fn insert_user(tx: &mut Transaction<'_>, user: User) -> Result<User> {
+pub async fn insert_user(tx: &mut Transaction, user: User) -> Result<User> {
     let user = query_as!(
         User,
         r#"insert into users
@@ -20,7 +20,7 @@ pub async fn insert_user(tx: &mut Transaction<'_>, user: User) -> Result<User> {
 }
 
 pub async fn fetch_user(
-    tx: &mut Transaction<'_>,
+    tx: &mut Transaction,
     spotify_id: &str,
 ) -> Result<User> {
     let user = query_as!(
@@ -36,17 +36,14 @@ pub async fn fetch_user(
     Ok(user)
 }
 
-pub async fn list_users(tx: &mut Transaction<'_>) -> Result<Vec<User>> {
+pub async fn list_users(tx: &mut Transaction) -> Result<Vec<User>> {
     query_as!(User, r#"select * from users"#)
         .fetch_all(&mut tx.0)
         .await
         .context("Could not fetch users")
 }
 
-pub async fn update_user(
-    tx: &mut Transaction<'_>,
-    user: &User,
-) -> Result<User> {
+pub async fn update_user(tx: &mut Transaction, user: &User) -> Result<User> {
     let user = query_as!(
         User,
         r#"update users

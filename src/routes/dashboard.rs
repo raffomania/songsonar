@@ -17,7 +17,7 @@ pub struct DashboardTemplate {}
 
 #[get("/dashboard")]
 pub async fn dashboard(
-    mut tx: Transaction<'_>,
+    mut tx: Transaction,
     session: cookies::Session,
     cookies: &CookieJar<'_>,
 ) -> Result<DashboardTemplate, Redirect> {
