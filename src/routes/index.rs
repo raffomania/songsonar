@@ -10,7 +10,7 @@ pub struct IndexTemplate {
 }
 
 #[get("/")]
-pub fn logged_in_index(_user: Session) -> Redirect {
+pub fn logged_in_index(_session: Session) -> Redirect {
     Redirect::to(uri!(crate::routes::dashboard::dashboard()))
 }
 

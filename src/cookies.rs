@@ -33,14 +33,18 @@ impl Session {
         })
     }
 
-    pub fn to_string(session: Session) -> String {
-        let expires = session.expires.to_rfc3339();
-        let json_session = JsonSession {
-            spotify_id: session.spotify_id,
+    pub fn into_cookie(self) -> Cookie<'static> {
+        let expires = self.expires.to_rfc3339();
+        let json_session = &JsonSession {
+            spotify_id: self.spotify_id,
             expires,
         };
 
-        miniserde::json::to_string(&json_session)
+        let mut cookie =
+            Cookie::new(SESSION, miniserde::json::to_string(json_session));
+        cookie.set_secure(true);
+
+        cookie
     }
 }
 

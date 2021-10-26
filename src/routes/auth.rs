@@ -1,7 +1,7 @@
 use crate::{basics::*, db::Transaction};
 use chrono::{Duration, Utc};
 use rocket::{
-    http::{Cookie, CookieJar, SameSite},
+    http::{CookieJar, SameSite},
     response::Redirect,
     uri,
 };
@@ -99,11 +99,7 @@ pub async fn spotify_connected(
         spotify_id,
         expires: Utc::now() + Duration::days(7),
     };
-    let mut session_cookie = Cookie::new(
-        crate::cookies::SESSION,
-        crate::cookies::Session::to_string(session),
-    );
-    session_cookie.set_secure(true);
+    let mut session_cookie = session.into_cookie();
     // The `Lax` setting is necessary to make the browser send the session cookie when
     // following the redirect returned below, because users come to this route via spotify
     // (a third-party domain)
