@@ -1,5 +1,5 @@
 use crate::{basics::*, db::Transaction, schemas::users::User};
-use sqlx::query_as;
+use sqlx::{query, query_as};
 
 pub async fn insert_user(tx: &mut Transaction, user: User) -> Result<User> {
     let user = query_as!(
@@ -59,4 +59,24 @@ pub async fn update_user(tx: &mut Transaction, user: &User) -> Result<User> {
     ).fetch_one(&mut tx.0).await?;
 
     Ok(user)
+}
+
+pub async fn delete_user(tx: &mut Transaction, user: User) -> Result<()> {
+    let affected_rows = query!(
+        r#"delete from users
+        where spotify_id = $1"#,
+        user.spotify_id
+    )
+    .execute(&mut tx.0)
+    .await?
+    .rows_affected();
+
+    if affected_rows != 1 {
+        return Err(anyhow!(
+            "Unexpected amount of users deleted: {}",
+            affected_rows
+        ));
+    }
+
+    Ok(())
 }

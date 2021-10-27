@@ -29,6 +29,15 @@ a {
   color: #00fc88;
 }
 
+button {
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .text-small {
   font-size: 0.85em;
 }
@@ -86,6 +95,10 @@ a {
 
 .mt-16 {
   margin-top: 4rem;
+}
+
+.mt-32 {
+  margin-top: 8rem;
 }
 
 .text-center {

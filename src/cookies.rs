@@ -1,6 +1,9 @@
+use std::iter;
+
 use crate::basics::*;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use miniserde::{Deserialize, Serialize};
+use rand::Rng;
 use rocket::http::{Cookie, CookieJar, Status};
 use rocket::outcome::{try_outcome, IntoOutcome};
 use rocket::request::{FromRequest, Outcome};
@@ -9,18 +12,35 @@ pub static OAUTH_STATE: &str = "oauth_state";
 pub static SESSION: &str = "session";
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct JsonSession {
+struct JsonSession {
     pub spotify_id: String,
     pub expires: String,
+    pub csrf_token: String,
 }
 
 #[derive(Debug)]
 pub struct Session {
     pub spotify_id: String,
     pub expires: DateTime<Utc>,
+    pub csrf_token: String,
 }
 
 impl Session {
+    pub fn new(spotify_id: String) -> Session {
+        let mut rng = rand::thread_rng();
+        let csrf_token: String = iter::repeat(())
+            .map(|()| rng.sample(rand::distributions::Alphanumeric))
+            .map(char::from)
+            .take(32)
+            .collect();
+
+        Session {
+            spotify_id,
+            expires: Utc::now() + Duration::days(7),
+            csrf_token,
+        }
+    }
+
     pub fn from_str(input: &str) -> Result<Session> {
         let deserialized: JsonSession = miniserde::json::from_str(input)?;
         let expires =
@@ -30,6 +50,7 @@ impl Session {
         Ok(Session {
             expires,
             spotify_id: deserialized.spotify_id,
+            csrf_token: deserialized.csrf_token,
         })
     }
 
@@ -37,6 +58,7 @@ impl Session {
         let expires = self.expires.to_rfc3339();
         let json_session = &JsonSession {
             spotify_id: self.spotify_id,
+            csrf_token: self.csrf_token,
             expires,
         };
 

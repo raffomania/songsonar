@@ -9,7 +9,16 @@
     If you haven't already, start following some artists to fill your playlist with! (If you don't follow many artists,
     your playlist might still be empty until next friday.)
 </p>
+
+<h3 class="mt-32">Account Settings</h2>
 <p>
-    Should you ever want to stop receiving updates, simply delete the playlist using your spotify app.
+    If you ever want to stop receiving playlist updates and want us to delete all your data, you can click here:
+</p>
+<form action="/dashboard/delete_account" method="POST">
+    <button>Delete my account</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+</form>
+<p>
+    If you want to remove your Song Sonar playlist as well, you can do so using the Spotify app.
 </p>
 {% endblock %}

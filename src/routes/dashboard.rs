@@ -1,33 +1,46 @@
-use crate::db::Transaction;
-use crate::{cookies, storage};
 use askama::Template;
-use rocket::http::{Cookie, CookieJar};
+use rocket::form::Form;
 use rocket::response::Redirect;
 
-use crate::basics::*;
+use crate::cookies::Session;
+use crate::db::Transaction;
 use crate::routes;
-
-#[get("/dashboard", rank = 1)]
-pub fn not_logged_in() -> Redirect {
-    Redirect::to(uri!(routes::index::index()))
-}
+use crate::schemas::users::User;
+use crate::{basics::*, csrf};
 
 #[derive(Template)]
 #[template(path = "dashboard.html")]
-pub struct DashboardTemplate {}
+pub struct DashboardTemplate {
+    csrf_token: String,
+}
 
 #[get("/dashboard")]
 pub async fn dashboard(
-    mut tx: Transaction,
-    session: cookies::Session,
-    cookies: &CookieJar<'_>,
-) -> Result<DashboardTemplate, Redirect> {
-    storage::users::fetch_user(&mut tx, &session.spotify_id)
-        .await
-        .map_err(|_| {
-            cookies.remove_private(Cookie::named(crate::cookies::SESSION));
-            Redirect::to(uri!(routes::index::index()))
-        })?;
+    _user: User,
+    session: Session,
+) -> Result<DashboardTemplate, AppError> {
+    Ok(DashboardTemplate {
+        csrf_token: session.csrf_token,
+    })
+}
 
-    Ok(DashboardTemplate {})
+#[get("/dashboard", rank = 1)]
+pub fn not_logged_in() -> Redirect {
+    Redirect::found(uri!(routes::index::index()))
+}
+
+#[post("/dashboard/delete_account", data = "<form>")]
+pub async fn delete_account(
+    user: User,
+    mut tx: Transaction,
+    csrf: crate::csrf::Validation,
+    form: Form<csrf::Form>,
+) -> Result<Redirect, AppError> {
+    csrf.validate(&form.csrf_token)?;
+
+    crate::storage::users::delete_user(&mut tx, user).await?;
+
+    tx.0.commit().await?;
+
+    Ok(Redirect::to(uri!(routes::index::index())))
 }

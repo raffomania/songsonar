@@ -2240,6 +2240,8 @@ dependencies = [
  "log",
  "miniserde",
  "pretty_env_logger",
+ "rand",
+ "ring",
  "rocket",
  "sentry",
  "sqlx",

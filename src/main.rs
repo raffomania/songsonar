@@ -4,6 +4,7 @@ extern crate rocket;
 mod args;
 mod basics;
 mod cookies;
+mod csrf;
 mod db;
 mod errors;
 mod request_guards;
@@ -81,6 +82,7 @@ async fn start() -> Result<()> {
                 routes::index::logged_in_index,
                 routes::dashboard::dashboard,
                 routes::dashboard::not_logged_in,
+                routes::dashboard::delete_account,
                 routes::auth::spotify_connected,
                 routes::public::styles,
                 routes::public::logo,
