@@ -44,7 +44,7 @@ button {
 
 .logo {
   max-width: 100%;
-  max-height: clamp(8rem, 20vw, 12rem);
+  height: clamp(8rem, 20vw, 12rem);
   animation: hover 3.5s infinite alternate ease-in-out;
   margin: 2rem 4vw;
 }
