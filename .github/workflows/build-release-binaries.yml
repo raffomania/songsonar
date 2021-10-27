@@ -47,6 +47,8 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
 
+      - uses: Swatinem/rust-cache@v1
+
       - name: Install sqlx-cli
         uses: actions-rs/cargo@v1
         with:
