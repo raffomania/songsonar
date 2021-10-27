@@ -15,6 +15,7 @@ pub async fn update_playlist(
     weeks_in_playlist: i16,
     playlist_id: &str,
 ) -> Result<()> {
+    log::info!("Updating playlist {}", playlist_id);
     let followed_artists: Vec<Artist> = get_all_cursor_pages!(after, {
         client.follow().get_followed_artists(50, after).await?.data
     });
@@ -69,9 +70,11 @@ pub async fn update_playlist(
         }
     }
 
-    log::debug!("Found {} tracks", track_ids.len());
+    log::info!("Found {} tracks", track_ids.len());
 
     playlist::replace_playlists_items(client, playlist_id, track_ids).await?;
+
+    log::info!("Playlist {} updated", playlist_id);
 
     Ok(())
 }
