@@ -1,15 +1,21 @@
 use askama::Template;
 use rocket::http::ContentType;
 
-#[get("/logo.svg")]
-pub fn logo() -> (ContentType, &'static str) {
-    let logo = include_str!("../../static/logo.svg");
-    (ContentType::SVG, logo)
+#[get("/favicon.ico")]
+pub fn favicon_ico() -> (ContentType, &'static [u8]) {
+    let icon = include_bytes!("../../static/favicon.ico");
+    (ContentType::Icon, icon)
 }
 
-#[get("/favicon.ico")]
-pub fn favicon() -> (ContentType, &'static str) {
-    let logo = include_str!("../../static/favicon.svg");
+#[get("/favicon.svg")]
+pub fn favicon_svg() -> (ContentType, &'static [u8]) {
+    let icon = include_bytes!("../../static/favicon.svg");
+    (ContentType::SVG, icon)
+}
+
+#[get("/logo.svg")]
+pub fn logo_svg() -> (ContentType, &'static [u8]) {
+    let logo = include_bytes!("../../static/logo.svg");
     (ContentType::SVG, logo)
 }
 
