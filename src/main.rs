@@ -3,6 +3,7 @@ extern crate rocket;
 
 mod args;
 mod basics;
+mod catchers;
 mod cookies;
 mod csrf;
 mod db;
@@ -90,6 +91,7 @@ async fn start() -> Result<()> {
                 routes::public::privacy_policy
             ],
         )
+        .register("/", catchers![catchers::not_found])
         .manage(pool)
         .launch();
 

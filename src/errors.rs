@@ -10,11 +10,14 @@ struct ErrorTemplate {
 
 #[derive(Error, Debug)]
 pub enum AppError {
-    #[error("Unknown error")]
+    #[error("An unknown error occurred.")]
     UnknownError(#[from] anyhow::Error),
 
-    #[error("Unknown error")]
+    #[error("An unknown error occurred.")]
     DatabaseError(#[from] sqlx::Error),
+
+    #[error("Page not found.")]
+    NotFound(),
 }
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for AppError {
@@ -22,10 +25,15 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for AppError {
         self,
         request: &'r askama_rocket::Request<'_>,
     ) -> rocket::response::Result<'o> {
-        log::error!("{:#?}", self);
+        match self {
+            AppError::NotFound() => {}
+            _ => {
+                log::error!("{:#?}", self);
+            }
+        };
 
         let response = ErrorTemplate {
-            description: "An unknown error occurred.".to_string(),
+            description: self.to_string(),
         };
 
         (Status::Ok, response).respond_to(request)
