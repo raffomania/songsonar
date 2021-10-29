@@ -16,10 +16,12 @@ mod sentry;
 mod spotify;
 mod storage;
 
-use args::{Command, StartOptions, UpdatePlaylistOptions};
-use db::{Transaction, MIGRATOR};
+use std::io;
 
-use crate::{args::Args, basics::*, db::create_db_pool};
+use crate::{basics::*, db::create_db_pool};
+use args::{Args, Command, StartOptions, UpdatePlaylistOptions};
+use aspotify::AuthError;
+use db::{Transaction, MIGRATOR};
 
 #[rocket::main]
 async fn main() -> Result<()> {
@@ -35,7 +37,63 @@ async fn main() -> Result<()> {
         Command::UpdatePlaylist(UpdatePlaylistOptions { user_id }) => {
             update_playlist(user_id).await
         }
+        Command::PruneUsers(_) => prune_users().await,
     }
+}
+
+async fn prune_users() -> Result<()> {
+    let pool = create_db_pool().await?;
+    let mut tx = Transaction(pool.begin().await?);
+    let client = crate::spotify::get_client()?;
+
+    let users = storage::users::list_users(&mut tx).await?;
+
+    log::info!("checking {} users", users.len());
+
+    let mut users_to_delete = Vec::new();
+    for user in users {
+        client
+            .set_refresh_token(Some(user.refresh_token.clone()))
+            .await;
+        let res = client.users_profile().get_current_user().await;
+        match res {
+            Err(aspotify::Error::Auth(AuthError { ref error, .. }))
+                if error == "invalid_grant" =>
+            {
+                users_to_delete.push(user);
+            }
+            Err(e) => {
+                log::info!(
+                    "unexpected error for user {}: {:?}",
+                    user.spotify_id,
+                    e
+                );
+            }
+            _ => {}
+        }
+    }
+
+    log::info!(
+        "Found {} users to prune: {:#?}",
+        users_to_delete.len(),
+        users_to_delete
+    );
+
+    eprint!("Continue? [y/N]: ");
+    let mut response = String::new();
+    io::stdin().read_line(&mut response)?;
+    if &response != "y\n" {
+        log::info!("Aborting");
+        return Ok(());
+    }
+
+    log::info!("Deleting users...");
+    for user in users_to_delete {
+        storage::users::delete_user(&mut tx, user).await?;
+    }
+    tx.0.commit().await?;
+
+    Ok(())
 }
 
 async fn update_playlist(user_id: String) -> Result<()> {
