@@ -13,8 +13,9 @@ pub fn get_logger(logger: Logger) -> impl Log {
 /// the app is running, because sentry only captures events until the guard
 /// is dropped.
 pub fn init() -> ClientInitGuard {
+    let version = git_version::git_version!(args = ["--tags"]);
     sentry::init(sentry::ClientOptions {
-        release: Some(git_version::git_version!().into()),
+        release: Some(version.into()),
         send_default_pii: false,
         ..Default::default()
     })
