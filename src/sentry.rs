@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use log::Log;
 use pretty_env_logger::env_logger::Logger;
 use sentry::ClientInitGuard;
@@ -17,6 +19,19 @@ pub fn init() -> ClientInitGuard {
     sentry::init(sentry::ClientOptions {
         release: Some(version.into()),
         send_default_pii: false,
+        before_send: Some(Arc::new(|event| {
+            let is_404 = event
+                .message
+                .as_ref()
+                .map(|msg| msg.starts_with("No matching routes for"))
+                .unwrap_or(false);
+
+            if is_404 {
+                None
+            } else {
+                Some(event)
+            }
+        })),
         ..Default::default()
     })
 }
