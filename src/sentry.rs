@@ -19,6 +19,7 @@ pub fn init() -> ClientInitGuard {
     sentry::init(sentry::ClientOptions {
         release: Some(version.into()),
         send_default_pii: false,
+        attach_stacktrace: true,
         before_send: Some(Arc::new(|event| {
             let is_404 = event
                 .message
