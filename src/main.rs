@@ -55,6 +55,12 @@ async fn prune_users() -> Result<()> {
         client
             .set_refresh_token(Some(user.refresh_token.clone()))
             .await;
+        client
+            .set_current_access_token(
+                user.access_token.clone(),
+                std::time::Instant::now(),
+            )
+            .await;
         let res = client.users_profile().get_current_user().await;
         match res {
             Err(aspotify::Error::Auth(AuthError { ref error, .. }))
