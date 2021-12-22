@@ -1,4 +1,4 @@
-use aspotify::{AlbumGroup, Artist, Client, Market};
+use aspotify::{AlbumGroup, Artist, ArtistsAlbum, Client, Market};
 use chrono::{Duration, Utc};
 
 use crate::{basics::*, get_all_cursor_pages, get_all_pages};
@@ -23,6 +23,7 @@ pub async fn update_playlist(
     log::debug!("Found {} artists", followed_artists.len());
 
     let mut track_ids: Vec<String> = Vec::new();
+    let mut all_albums: Vec<ArtistsAlbum> = Vec::new();
     for artist in followed_artists {
         let albums = get_all_pages!(offset, {
             client
@@ -41,33 +42,46 @@ pub async fn update_playlist(
         let cutoff = Utc::now().naive_local().date()
             - Duration::weeks(weeks_in_playlist.into());
 
-        let relevant_albums =
-            albums.iter().filter(|a| a.release_date >= cutoff);
+        let mut relevant_albums = albums
+            .into_iter()
+            .filter(|a| a.release_date >= cutoff)
+            .collect::<Vec<_>>();
 
-        for album in relevant_albums {
-            log::debug!("Found album '{}'", &album.name);
-            let tracks = get_all_pages!(offset, {
-                client
-                    .albums()
-                    .get_album_tracks(
-                        &album.id,
-                        50,
-                        offset,
-                        Some(Market::FromToken),
-                    )
-                    .await?
-                    .data
-            });
+        all_albums.append(&mut relevant_albums);
+    }
 
-            let mut new_track_ids: Vec<String> = tracks
-                .into_iter()
-                .filter_map(|track| {
-                    track.linked_from.map(|link| link.id).or(track.id)
-                })
-                .collect();
+    log::info!(
+        "Found {} albums for the last {} weeks",
+        all_albums.len(),
+        weeks_in_playlist
+    );
 
-            track_ids.append(&mut new_track_ids);
-        }
+    // Reverse-sort by release date (newest first)
+    all_albums.sort_by(|a, b| b.release_date.cmp(&a.release_date));
+
+    for album in all_albums {
+        log::debug!("Found album '{}', {}", &album.name, album.release_date);
+        let tracks = get_all_pages!(offset, {
+            client
+                .albums()
+                .get_album_tracks(
+                    &album.id,
+                    50,
+                    offset,
+                    Some(Market::FromToken),
+                )
+                .await?
+                .data
+        });
+
+        let mut new_track_ids: Vec<String> = tracks
+            .into_iter()
+            .filter_map(|track| {
+                track.linked_from.map(|link| link.id).or(track.id)
+            })
+            .collect();
+
+        track_ids.append(&mut new_track_ids);
     }
 
     log::info!("Found {} tracks", track_ids.len());
