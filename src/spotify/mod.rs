@@ -1,15 +1,17 @@
-use aspotify::{AlbumGroup, Artist, ArtistsAlbum, Client, Market};
+use aspotify::{Artist, ArtistsAlbum, Client};
 use chrono::{Duration, Utc};
 use rocket::futures::future::join_all;
 
-use crate::{basics::*, get_all_cursor_pages, get_all_pages};
+use crate::{basics::*, get_all_cursor_pages};
 
+mod albums;
+mod artists;
 mod auth;
-mod playlist;
+mod playlists;
 mod util;
 
 pub use auth::{get_authorization_url, get_client};
-pub use playlist::create_playlist;
+pub use playlists::create_playlist;
 
 pub async fn update_playlist(
     client: &Client,
@@ -24,32 +26,17 @@ pub async fn update_playlist(
     log::debug!("Found {} artists", followed_artists.len());
 
     let album_futures = followed_artists.iter().map(|artist| async move {
-        let albums = get_all_pages!(offset, {
-            client
-                .artists()
-                .get_artist_albums(
-                    &artist.id,
-                    Some(&[AlbumGroup::Single, AlbumGroup::Album]),
-                    50,
-                    offset,
-                    Some(Market::FromToken),
-                )
-                .await?
-                .data
-        });
-
         let cutoff = Utc::now().naive_local().date()
             - Duration::weeks(weeks_in_playlist.into());
 
-        Result::<Vec<_>, anyhow::Error>::Ok(
-            albums
-                .into_iter()
-                .filter(|a| a.release_date >= cutoff)
-                .collect(),
-        )
+        Ok(artists::get_all_albums(client, artist)
+            .await?
+            .into_iter()
+            .filter(|a| a.release_date >= cutoff)
+            .collect())
     });
     // Check that all entries are actually Ok()
-    let all_albums: Result<Vec<_>, _> =
+    let all_albums: Result<Vec<Vec<ArtistsAlbum>>, anyhow::Error> =
         join_all(album_futures).await.into_iter().collect();
 
     // Flatten vectors
@@ -67,27 +54,22 @@ pub async fn update_playlist(
 
     let track_id_futures = all_albums.iter().map(|album| async move {
         log::debug!("Found album '{}', {}", &album.name, album.release_date);
-        let tracks = get_all_pages!(offset, {
-            client
-                .albums()
-                .get_album_tracks(
-                    &album.id,
-                    50,
-                    offset,
-                    Some(Market::FromToken),
-                )
+
+        let new_track_ids: Result<Vec<String>, anyhow::Error> =
+            albums::get_all_tracks(client, album)
                 .await?
-                .data
-        });
+                .into_iter()
+                .map(|track| {
+                    track
+                        .linked_from
+                        .map(|link| link.id)
+                        .or(track.id)
+                        // We assume that track IDs are always present, because they are only missing for local files that we should never encounter
+                        .ok_or_else(|| anyhow!("missing track ID"))
+                })
+                .collect();
 
-        let new_track_ids: Vec<String> = tracks
-            .into_iter()
-            .filter_map(|track| {
-                track.linked_from.map(|link| link.id).or(track.id)
-            })
-            .collect();
-
-        Ok(new_track_ids)
+        new_track_ids
     });
 
     // Check that each vector of an album's tracks is Ok()
@@ -99,7 +81,7 @@ pub async fn update_playlist(
 
     log::info!("Found {} tracks", track_ids.len());
 
-    playlist::replace_playlists_items(client, playlist_id, track_ids).await?;
+    playlists::replace_playlists_items(client, playlist_id, track_ids).await?;
 
     log::info!("Playlist {} updated", playlist_id);
 
