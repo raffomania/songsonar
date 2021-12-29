@@ -64,7 +64,7 @@ pub async fn update_playlist(
                         .linked_from
                         .map(|link| link.id)
                         .or(track.id)
-                        // We assume that track IDs are always present, because they are only missing for local files that we should never encounter
+                        // We assume that track IDs are always present, because they are only missing for local files which we should never encounter
                         .ok_or_else(|| anyhow!("missing track ID"))
                 })
                 .collect();
