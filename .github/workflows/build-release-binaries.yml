@@ -53,7 +53,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: sqlx-cli --no-default-features --features postgres runtime-tokio-native-tls
+          args: sqlx-cli --no-default-features --features postgres,native-tls
 
       - name: Run migrations
         run: sqlx database reset -y
