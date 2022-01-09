@@ -9,8 +9,9 @@ resolver = "2"
 [profile.release]
 lto = "thin"
 panic = 'abort'
-codegen-units = 1
 opt-level = 'z'
+# We want stacktraces in production
+debug = true
 
 [profile.dev]
 # Disabling debug info speeds up builds a bunch,
