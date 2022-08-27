@@ -8,10 +8,10 @@ pub struct Validation {
     expected_token: String,
 }
 
+// The FromForm derive is causing this lint to fail at the moment.
 #[allow(clippy::unnecessary_lazy_evaluations)]
 mod workaround {
     #[derive(FromForm)]
-    // The FromForm derive is causing this lint to fail at the moment.
     pub struct Form {
         pub csrf_token: String,
     }
