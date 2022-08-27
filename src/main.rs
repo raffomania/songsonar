@@ -161,7 +161,10 @@ async fn start() -> Result<()> {
 
     tokio::select! {
         res = scheduled_updates => res?,
-        res = web_server => res.context("Could not start rocket server"),
+        res = web_server => {
+            let _rocket = res.context("Could not start rocket server")?;
+            Ok(())
+        },
     }
 }
 

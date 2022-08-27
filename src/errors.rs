@@ -20,7 +20,7 @@ pub enum AppError {
     NotFound(),
 }
 
-impl<'r, 'o: 'r> Responder<'r, 'o> for AppError {
+impl<'r: 'o, 'o: 'r> Responder<'r, 'o> for AppError {
     fn respond_to(
         self,
         request: &'r askama_rocket::Request<'_>,
