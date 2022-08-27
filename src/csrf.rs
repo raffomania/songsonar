@@ -2,13 +2,19 @@ use rocket::request::FromRequest;
 
 use crate::{basics::*, cookies};
 
+pub use workaround::Form;
+
 pub struct Validation {
     expected_token: String,
 }
 
-#[derive(FromForm)]
-pub struct Form {
-    pub csrf_token: String,
+#[allow(clippy::unnecessary_lazy_evaluations)]
+mod workaround {
+    #[derive(FromForm)]
+    // The FromForm derive is causing this lint to fail at the moment.
+    pub struct Form {
+        pub csrf_token: String,
+    }
 }
 
 impl Validation {
