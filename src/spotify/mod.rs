@@ -29,11 +29,20 @@ pub async fn update_playlist(
         let cutoff = Utc::now().naive_local().date()
             - Duration::weeks(weeks_in_playlist.into());
 
-        Ok(artists::get_all_albums(client, artist)
-            .await?
-            .into_iter()
-            .filter(|a| a.release_date >= cutoff)
-            .collect())
+        let mut all_albums: Vec<ArtistsAlbum> =
+            artists::get_all_albums(client, artist)
+                .await?
+                .into_iter()
+                .filter(|a| a.release_date >= cutoff)
+                .collect();
+
+        // Remove albums with identical names, assuming they contain identical tracks.
+        // If artists ever release differing albums with the same name,
+        // that's a bug I'm willing to accept.
+        all_albums.sort_by(|a, b| a.name.cmp(&b.name));
+        all_albums.dedup_by(|a, b| a.name == b.name);
+
+        Ok(all_albums)
     });
     // Check that all entries are actually Ok()
     let all_albums: Result<Vec<Vec<ArtistsAlbum>>, anyhow::Error> =
@@ -42,6 +51,13 @@ pub async fn update_playlist(
     // Flatten vectors
     let mut all_albums: Vec<ArtistsAlbum> =
         all_albums?.into_iter().flatten().collect();
+
+    // When following multiple artists in a collaboration,
+    // duplicates may slip through the per-artist deduplication.
+    // These albums should be completely identical and can be removed using `dedup`
+    // (instead of `dedup_by` as used above)
+    all_albums.sort_by(|a, b| a.name.cmp(&b.name));
+    all_albums.dedup();
 
     log::info!(
         "Found {} albums for the last {} weeks",
